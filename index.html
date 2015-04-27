@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>AndroidDBTool</title>
+
+    <link rel="stylesheet" href="slick.grid.css" type="text/css"/>
+    <link rel="stylesheet" href="jquery-ui-1.8.16.custom.css" type="text/css"/>
+    <link rel="stylesheet" href="examples.css" type="text/css"/>
+
+    <script src="jquery-1.9.1.js"></script>
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <script src="rest-api.js"></script>
+    <script src="web.js"></script>
+
+    <link rel="import"
+          href="bower_components/core-header-panel/core-header-panel.html">
+    <link rel="import"
+          href="bower_components/core-toolbar/core-toolbar.html">
+    <link rel="import"
+          href="bower_components/font-roboto/roboto.html">
+    <link rel="import"
+          href="bower_components/paper-button/paper-button.html">
+    <link rel="import"
+          href="bower_components/core-selector/core-selector.html">
+    <link rel="import"
+          href="bower_components/paper-dropdown/paper-dropdown.html">
+    <link rel="import"
+          href="bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+    <link rel="import"
+          href="bower_components/core-menu/core-menu.html">
+    <link rel="import"
+          href="bower_components/core-item/core-item.html">
+    <link rel="import"
+          href="bower_components/paper-item/paper-item.html">
+    <link rel="import"
+          href="bower_components/core-drawer-panel/core-drawer-panel.html">
+    <link rel="import"
+          href="bower_components/paper-icon-button/paper-icon-button.html">
+    <link rel="import"
+          href="bower_components/core-icons/core-icons.html">
+    <link rel="import"
+          href="bower_components/paper-checkbox/paper-checkbox.html">
+    <link rel="import"
+          href="bower_components/core-label/core-label.html">
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            background-color: #E5E5E5;
+            font-family: 'RobotoDraft', sans-serif;
+        }
+
+        core-header-panel {
+            height: 100%;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        core-toolbar {
+            background: #03a9f4;
+            color: white;
+            width: 100%;
+        }
+
+        .paper-button {
+            background: #FFFFFF;
+            border-radius: 50%;
+            color: #03a9f4;
+            font-size: 15px;
+            vertical-align: middle;
+        }
+
+        label {
+            vertical-align: middle;
+        }
+
+        input {
+            vertical-align: middle;
+            padding: 4px;
+        }
+
+        select {
+            font-size: 15px;
+            background: white;
+            color: black;
+        }
+
+        paper-item {
+            background: white;
+            color: black;
+            font-size: 15px;
+            vertical-align: middle;
+        }
+
+        paper-dropdown-menu[disabled] {
+            background: #ebebeb;
+        }
+
+        paper-dropdown-menu {
+            background: white;
+            color: black;
+            font-size: 15px;
+            height: 28px;
+            padding: 5px;
+            vertical-align: middle;
+
+            box-sizing: border-box;
+            min-width: 8em;
+            text-align: center;
+            outline: none;
+            border-radius: 3px;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -webkit-user-select: none;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        #navHeader {
+            background-color: #56BA89;
+        }
+
+        core-drawer-panel:not([narrow]) #navicon {
+            display: none;
+        }
+
+        #sidebar {
+            background-color: white;
+            height: 97%;
+            padding-top: 3%;
+            padding-left: 3%;
+        }
+
+        paper-checkbox {
+            margin-bottom: 10px;
+        }
+    </style>
+
+</head>
+
+<body unresolved>
+
+<core-drawer-panel id="drawerPanel">
+
+    <core-header-panel drawer style="background-color: #fff;">
+        <core-toolbar id="navHeader">
+            <span>Options</span>
+        </core-toolbar>
+        <div id="sidebar" layout="" vertical="">
+            <h2 onclick="document.getElementById('collapse').toggle();">Projections</h2>
+            <core-collapse id="collapse">
+                <x-trigger>
+                    <div layout="" vertical="" id="sidebar-projections">
+                        <paper-checkbox role="checkbox" label="not"></paper-checkbox>
+                    </div>
+                </x-trigger>
+            </core-collapse>
+            <h2>Selections</h2>
+        </div>
+    </core-header-panel>
+
+    <core-header-panel main>
+        <core-toolbar id="mainHeader">
+
+            <paper-icon-button
+                    id="navicon" icon="menu"></paper-icon-button>
+            <table style="width:100%;border: 0px">
+                <tr align="center">
+                    <td>
+                        <label>IP:</label>
+                        <input id="ip" placeholder="ip-address:port" oninput="validateIP();" value=""/>
+                        <paper-icon-button class="paper-button" id="ip-check" icon="arrow-forward"
+                                           onclick="getProviders();">Load Providers
+                        </paper-icon-button>
+
+                    </td>
+
+                    <td style="width: 33%; padding:20px;" align="center">
+                        <label>PROVIDER:</label>
+
+                        <paper-dropdown-menu id="providerDropDownMenu" disabled="true">
+                            <paper-dropdown id="drop" class="dropdown">
+                                <core-menu id="provider_menu" selected="0">
+                                    <paper-item id="provider/-1">No provider found</paper-item>
+                                </core-menu>
+                            </paper-dropdown>
+                        </paper-dropdown-menu>
+
+                    </td>
+
+                    <td style="width: 33%; padding:20px;" align="center">
+                        <label>TABLE:</label>
+
+                        <paper-dropdown-menu id="tableDropDownMenu" disabled="true">
+                            <paper-dropdown class="dropdown">
+                                <core-menu id="table_menu" selected="0">
+                                    <paper-item id="table/-1">No table found</paper-item>
+                                </core-menu>
+                            </paper-dropdown>
+                        </paper-dropdown-menu>
+                    </td>
+                </tr>
+
+            </table>
+        </core-toolbar>
+
+        <div id="myGrid" class="content" flex="" style="height: 100%"></div>
+
+        <script src="jquery-1.7.min.js"></script>
+        <script src="jquery.event.drag-2.2.js"></script>
+
+        <script src="slick.core.js"></script>
+        <script src="slick.grid.js"></script>
+
+        <script>
+            function copyToClipboard(text) {
+                window.prompt("Copy to clipboard: Ctrl+C, Enter", text);
+            }
+            var grid;
+            var columns = [];
+
+            var options = {
+                enableCellNavigation: true,
+                enableColumnReorder: false,
+                editable: true
+            };
+
+            $(function () {
+                var data = [];
+                grid = new Slick.Grid("#myGrid", data, columns, options);
+                grid.onDblClick.subscribe(function (e, args) {
+                    console.log(grid.getActiveCellNode().textContent);
+                    copyToClipboard(grid.getActiveCellNode().textContent);
+                });
+            })
+        </script>
+
+    </core-header-panel>
+</core-drawer-panel>
+</body>
+</html>
