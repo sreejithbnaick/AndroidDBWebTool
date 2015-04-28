@@ -6,6 +6,8 @@ var choose_provider = "Choose provider";
 var no_table_found = "No table found";
 var choose_table = "Choose table";
 var no_result_found = "No result found";
+var no_column_option = "No columns found";
+var choose_column_option = "Choose column";
 
 window.addEventListener('polymer-ready', function (e) {
     var menu = document.querySelector('#providerDropDownMenu');
@@ -74,7 +76,29 @@ function setPolyProviders(providerArray) {
 
     if (providerArray == null) {
         console.log("No provider found");
+        clearProjections();
+        sel.appendChild(createPaperItem(no_provider_option, "provider/" + -1));
+    } else {
+        sel.appendChild(createPaperItem(choose_provider, "provider/" + -1));
 
+        var x = 0;
+        for (; x < providerArray.length; x++) {
+            sel.appendChild(createPaperItem(providerArray[x].provider, "provider/" + providerArray[x].urlIndex));
+        }
+    }
+}
+
+function setPolyProjections(projectionArray){
+    var sel = document.getElementById("provider_menu");
+    var par = sel.parentNode;
+
+    par.removeChild(sel);
+
+    sel = createCoreMenu("provider_menu");
+    par.appendChild(sel);
+
+    if (projectionArray == null) {
+        console.log("No projection found");
         sel.appendChild(createPaperItem(no_provider_option, "provider/" + -1));
     } else {
         sel.appendChild(createPaperItem(choose_provider, "provider/" + -1));
@@ -98,7 +122,7 @@ function setPolyTables(tablesArray) {
 
     if (tablesArray == null) {
         console.log("No provider found");
-
+        clearProjections();
         sel.appendChild(createPaperItem(no_table_found, "table/" + -1));
     } else {
         sel.appendChild(createPaperItem(choose_table, "table/" + -1));
@@ -109,9 +133,23 @@ function setPolyTables(tablesArray) {
         }
     }
 }
-function setProjections(projections) {
+
+function clearProjections(){
+    document.getElementById("no_projection_label").hidden = false;
     var sel = document.getElementById("sidebar-projections");
     sel.innerHTML="";
+}
+
+function setProjections(projections) {
+    if(projections ==null || projections.length<0){
+        document.getElementById("no_projection_label").hidden = false;
+    }else{
+        document.getElementById("no_projection_label").hidden = true;
+    }
+
+    var sel = document.getElementById("sidebar-projections");
+    sel.innerHTML="";
+
     for (var x = 0; x < projections.length; x++) {
         var proj = projections[x].field;
         sel.appendChild(createPaperCheckbox(proj));

@@ -27,6 +27,7 @@ li {
 #myGrid {
   outline: 0;
   border: 0px solid gray;
+  margin-left: 2px;
 }
 
 .grid-header {

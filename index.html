@@ -43,6 +43,12 @@
           href="bower_components/paper-checkbox/paper-checkbox.html">
     <link rel="import"
           href="bower_components/core-label/core-label.html">
+    <link rel="import"
+          href="bower_components/core-collapse/core-collapse.html">
+    <link rel="import"
+          href="bower_components/paper-icon-button/paper-icon-button.html">
+    <link rel="import"
+          href="bower_components/paper-ripple/paper-ripple.html">
 
     <style>
         html, body {
@@ -64,7 +70,7 @@
             width: 100%;
         }
 
-        .paper-button {
+        .paper-button-circle {
             background: #FFFFFF;
             border-radius: 50%;
             color: #03a9f4;
@@ -136,6 +142,15 @@
         paper-checkbox {
             margin-bottom: 10px;
         }
+
+        .sel_button {
+            width: 2em;
+            background: #F1F1F1;
+        }
+
+        .marginTop10 {
+            margin-top: 10px;
+        }
     </style>
 
 </head>
@@ -144,20 +159,77 @@
 
 <core-drawer-panel id="drawerPanel">
 
-    <core-header-panel drawer style="background-color: #fff;">
+    <core-header-panel drawer mode="scroll">
         <core-toolbar id="navHeader">
             <span>Options</span>
         </core-toolbar>
-        <div id="sidebar" layout="" vertical="">
-            <h2 onclick="document.getElementById('collapse').toggle();">Projections</h2>
-            <core-collapse id="collapse">
+        <div id="sidebar" layout="" vertical="" >
+            <h3 id="projectionCollapseLabel" onclick="document.getElementById('proj-collapse').toggle();"
+                style="color:#03a9f4 ">PROJECTIONS&#x20;&#9660;</h3>
+            <core-collapse id="proj-collapse" targetLabelElement="projectionCollapseLabel"
+                           targetLabelString="PROJECTIONS">
                 <x-trigger>
-                    <div layout="" vertical="" id="sidebar-projections">
-                        <paper-checkbox role="checkbox" label="not"></paper-checkbox>
+                    <label id="no_projection_label">No projection found</label>
+                    <div layout="" vertical="" id="sidebar-projections" style="margin-bottom: 10px">
                     </div>
                 </x-trigger>
             </core-collapse>
-            <h2>Selections</h2>
+
+            <h3 id="selectionCollapseLabel" onclick="document.getElementById('sel-collapse').toggle();"
+                style="color:#03a9f4 ">SELECTIONS&#x20;&#9660;</h3>
+            <core-collapse id="sel-collapse" targetLabelElement="selectionCollapseLabel"
+                           targetLabelString="SELECTIONS  ">
+                <x-trigger>
+                    <div layout="" vertical="" id="sidebar-selections" style="margin-bottom: 10px;margin-right: 10px">
+                        <div layout="" vertical="" style="margin-bottom: 10px">
+
+                            <paper-dropdown-menu id="selectionDropDownMenu" disabled="true">
+                                <paper-dropdown  class="dropdown">
+                                    <core-menu id="selection_menu" selected="0">
+                                        <paper-item id="selection/-1">No column found</paper-item>
+                                    </core-menu>
+                                </paper-dropdown>
+                            </paper-dropdown-menu>
+
+                            <label>=</label>
+
+                            <input id="selectionArg-input" placeholder="selectionValue" value=""/>
+                        </div>
+
+                        <div layout="" horizontal="" class="marginTop10">
+                            <paper-button class="sel_button">ADD</paper-button>
+                            <paper-button class="sel_button">CLEAR</paper-button>
+                        </div>
+
+                        <div layout="" horizontal="" id="sel_buttons" class="marginTop10">
+                            <paper-button class="sel_button">(</paper-button>
+                            <paper-button class="sel_button">)</paper-button>
+                        </div>
+
+                        <div layout="" horizontal="" class="marginTop10">
+                            <paper-button class="sel_button">AND</paper-button>
+                            <paper-button class="sel_button">OR</paper-button>
+                        </div>
+                        <label id="selectionLabel" class="marginTop10" style="background: #F1F1F1;padding: 10px">No
+                            selections</label>
+                    </div>
+                </x-trigger>
+            </core-collapse>
+
+            <h3 id="orderCollapseLabel" onclick="document.getElementById('order-collapse').toggle();"
+                style="color:#03a9f4 ">ORDER BY&#x20;&#9660;</h3>
+            <core-collapse id="order-collapse" targetLabelElement="orderCollapseLabel"
+                           targetLabelString="ORDER BY  ">
+                <x-trigger>
+                    <paper-dropdown-menu id="orderDropDownMenu" disabled="true">
+                        <paper-dropdown  class="dropdown">
+                            <core-menu id="order_menu" selected="0">
+                                <paper-item id="order/-1">No column found</paper-item>
+                            </core-menu>
+                        </paper-dropdown>
+                    </paper-dropdown-menu>
+                </x-trigger>
+            </core-collapse>
         </div>
     </core-header-panel>
 
@@ -171,7 +243,7 @@
                     <td>
                         <label>IP:</label>
                         <input id="ip" placeholder="ip-address:port" oninput="validateIP();" value=""/>
-                        <paper-icon-button class="paper-button" id="ip-check" icon="arrow-forward"
+                        <paper-icon-button class="paper-button-circle" id="ip-check" icon="arrow-forward"
                                            onclick="getProviders();">Load Providers
                         </paper-icon-button>
 
