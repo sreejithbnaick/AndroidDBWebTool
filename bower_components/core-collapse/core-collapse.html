@@ -154,6 +154,12 @@ and instead put a div inside and style that.
 
     ready: function() {
       this.target = this.target || this;
+      if(this.targetLabelElement!=null){
+        if(this.opened)
+          document.getElementById(this.targetLabelElement).innerHTML=this.targetLabelString+"   "+upArrow;
+        else
+          document.getElementById(this.targetLabelElement).innerHTML=this.targetLabelString+"   "+downArrow;
+      }
     },
 
     domReady: function() {
@@ -209,8 +215,7 @@ and instead put a div inside and style that.
      */
     toggle: function() {
       this.opened = !this.opened;
-        console.log("Toggle");
-        console.log(this.targetLabelElement);
+
       if(this.targetLabelElement!=null){
         if(this.opened)
             document.getElementById(this.targetLabelElement).innerHTML=this.targetLabelString+"   "+upArrow;

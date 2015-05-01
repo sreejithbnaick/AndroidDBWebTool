@@ -44,6 +44,30 @@ function getTables(providerIndex){
     });
 }
 
+function getColumns(){
+    var providerIndex = document.getElementById("provider_menu").selectedItem.id.split("/")[1];
+    if(providerIndex <0)
+        return;
+    var table = document.getElementById("table_menu").selectedItem.id.split("/")[1];
+    if(table == -1)
+        return;
+
+    var url = "http://"+$("#ip").val()+"/"+providerIndex+"/projections";
+    console.log(url);
+
+    var xhr = makeCorsRequest(url,function(){
+        console.log("getColumns: "+xhr.responseText);
+        $.getScript('web.js',function(){
+            setProjections(JSON.parse(xhr.responseText));
+        });
+    },function(){
+        console.log("getColumns: onerror");
+        $.getScript('web.js',function(){
+            setProjections(null);
+        });
+    });
+}
+
 function loadDB(){
     var providerIndex = document.getElementById("provider_menu").selectedItem.id.split("/")[1];
     if(providerIndex <0)
