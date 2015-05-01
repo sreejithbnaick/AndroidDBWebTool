@@ -19,7 +19,8 @@ function getProviders(){
     });
 }
 
-function getTables(providerIndex){
+function getTables(){
+    var providerIndex = document.getElementById("provider_menu").selectedItem.id.split("/")[1];
     if(providerIndex < 0) {
         setPolyTables(null);
         document.getElementById("tableDropDownMenu").disabled = true;
@@ -34,7 +35,6 @@ function getTables(providerIndex){
         $.getScript('web.js',function(){
             setPolyTables(JSON.parse(xhr.responseText));
         });
-        document.getElementById("tableDropDownMenu").disabled = false;
     },function(){
         console.log("getTables: onerror");
         $.getScript('web.js',function(){
@@ -44,7 +44,7 @@ function getTables(providerIndex){
     });
 }
 
-function getColumns(){
+function getDBColumns(){
     var providerIndex = document.getElementById("provider_menu").selectedItem.id.split("/")[1];
     if(providerIndex <0)
         return;
@@ -52,16 +52,16 @@ function getColumns(){
     if(table == -1)
         return;
 
-    var url = "http://"+$("#ip").val()+"/"+providerIndex+"/projections";
+    var url = "http://"+$("#ip").val()+"/"+providerIndex+"/"+table+"/projections";
     console.log(url);
 
     var xhr = makeCorsRequest(url,function(){
-        console.log("getColumns: "+xhr.responseText);
+        console.log("getDBColumns: "+xhr.responseText);
         $.getScript('web.js',function(){
             setProjections(JSON.parse(xhr.responseText));
         });
     },function(){
-        console.log("getColumns: onerror");
+        console.log("getDBColumns: onerror");
         $.getScript('web.js',function(){
             setProjections(null);
         });
@@ -75,8 +75,13 @@ function loadDB(){
     var table = document.getElementById("table_menu").selectedItem.id.split("/")[1];
     if(table == -1)
         return;
+    var projections = getSelectedProjections();
 
     var url = "http://"+$("#ip").val()+"/"+providerIndex+"/"+table+"?type=json";
+
+    if(projections!=null){
+        url+="&proj="+projections;
+    }
     console.log(url);
 
     var xhr = makeCorsRequest(url,function(){
@@ -90,6 +95,22 @@ function loadDB(){
             setDBResult(null);
         });
     });
+}
+
+function getSelectedProjections(){
+    var div = document.getElementById("sidebar-projections");
+    var childs = div.childNodes;
+    var result =null;
+    for(var x=0;x<childs.length;x++){
+        var child = childs[x];
+        if(child.checked){
+            if(result ==null)
+                result = child.label;
+            else
+                result = result+","+child.label;
+        }
+    }
+    return result;
 }
 
 function createCORSRequest(method, url) {
