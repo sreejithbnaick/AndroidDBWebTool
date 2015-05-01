@@ -2,19 +2,22 @@
  * Created by sreejith on 24/4/15.
  */
 function getProviders(){
-    var url = "http://"+$("#ip").val();
+    var url = "http://"+$("#ip").val()+":"+$("#port").val();
     console.log(url);
+    document.getElementById("providerSpinner").active = true;
     var xhr = makeCorsRequest(url,function(){
         console.log("getProviders: "+xhr.responseText);
         $.getScript('web.js',function(){
             setPolyProviders(JSON.parse(xhr.responseText));
         });
+        document.getElementById("providerSpinner").active = false;
         document.getElementById("providerDropDownMenu").disabled = false;
     },function(){
         console.log("getProviders: onerror");
         $.getScript('web.js',function(){
             setPolyProviders(null);
         });
+        document.getElementById("providerSpinner").active = false;
         document.getElementById("providerDropDownMenu").disabled = true;
     });
 }
@@ -27,11 +30,13 @@ function getTables(){
         return;
     }
 
-    var url = "http://"+$("#ip").val()+"/"+providerIndex;
+    var url = "http://"+$("#ip").val()+":"+$("#port").val()+"/"+providerIndex;
     console.log(url);
 
+    document.getElementById("tableSpinner").active = true;
     var xhr = makeCorsRequest(url,function(){
         console.log("getTables: "+xhr.responseText);
+        document.getElementById("tableSpinner").active = false;
         $.getScript('web.js',function(){
             setPolyTables(JSON.parse(xhr.responseText));
         });
@@ -40,6 +45,7 @@ function getTables(){
         $.getScript('web.js',function(){
             setPolyTables(null);
         });
+        document.getElementById("tableSpinner").active = false;
         document.getElementById("tableDropDownMenu").disabled = true;
     });
 }
@@ -52,7 +58,7 @@ function getDBColumns(){
     if(table == -1)
         return;
 
-    var url = "http://"+$("#ip").val()+"/"+providerIndex+"/"+table+"/projections";
+    var url = "http://"+$("#ip").val()+":"+$("#port").val()+"/"+providerIndex+"/"+table+"/projections";
     console.log(url);
 
     var xhr = makeCorsRequest(url,function(){
@@ -77,7 +83,7 @@ function loadDB(){
         return;
     var projections = getSelectedProjections();
 
-    var url = "http://"+$("#ip").val()+"/"+providerIndex+"/"+table+"?type=json";
+    var url = "http://"+$("#ip").val()+":"+$("#port").val()+"/"+providerIndex+"/"+table+"?type=json";
 
     if(projections!=null){
         url+="&proj="+projections;

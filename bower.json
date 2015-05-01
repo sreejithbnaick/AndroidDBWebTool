@@ -26,6 +26,7 @@
     "paper-checkbox": "polymer/paper-checkbox#~0.5.5",
     "core-label": "polymer/core-label#~0.5.5",
     "core-drag-drop": "polymer/core-drag-drop#~0.5.5",
-    "core-tooltip": "polymer/core-tooltip#~0.5.5"
+    "core-tooltip": "polymer/core-tooltip#~0.5.5",
+    "paper-spinner": "polymer/paper-spinner#~0.5.5"
   }
 }

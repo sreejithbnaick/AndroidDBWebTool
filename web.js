@@ -17,7 +17,6 @@ var checkBoxIdGenerator = 0;
 function onBodyLoad(){
     var sel = document.getElementById("mainHeader");
     sel.style.width = window.innerWidth+(document.body.scrollWidth-window.innerWidth)+"px";
-    sel.getElementById("dropShadow").style.width = window.innerWidth+(document.body.scrollWidth-window.innerWidth)+"px";
     if (window.innerWidth < 1600) {
         sel.style.height = "105px";
         document.getElementById("topTable").style.top = "1em";
@@ -26,6 +25,11 @@ function onBodyLoad(){
         document.getElementById("topTable").style.top = "0px";
     }
 }
+
+window.addEventListener('polymer-ready', function (e) {
+   validateIP();
+});
+
 window.addEventListener('polymer-ready', function (e) {
     var menu = document.querySelector('#providerDropDownMenu');
     menu.addEventListener('core-select', function (e) {
@@ -38,6 +42,7 @@ window.addEventListener('polymer-ready', function (e) {
         }
     });
 });
+
 
 window.addEventListener('polymer-ready', function (e) {
     var menu = document.querySelector('#tableDropDownMenu');
@@ -52,7 +57,6 @@ window.addEventListener('polymer-ready', function (e) {
 
 window.addEventListener('resize', function (e) {
     var sel = document.getElementById("mainHeader");
-    document.getElementById("dropShadow").style.width = window.innerWidth+(document.body.scrollWidth-window.innerWidth)+"px";
     sel.style.width = window.innerWidth+(document.body.scrollWidth-window.innerWidth)+"px";
     if (e.target.innerWidth < 1600) {
         sel.style.height = "105px";
@@ -127,7 +131,7 @@ document.addEventListener('polymer-ready', function () {
 });
 
 function validateIP() {
-    var input = $("#ip").val();
+    var input = $("#ip").val()+":"+$("#port").val();
     var parts = input.split(":");
     var ip = parts[0].split(".");
     var port = parts[1];
@@ -243,6 +247,7 @@ function clearProjections() {
 function setProjections(projections) {
     if (projections == null || projections.length < 0) {
         document.getElementById("no_projection_label").hidden = false;
+        return;
     } else {
         document.getElementById("no_projection_label").hidden = true;
     }
