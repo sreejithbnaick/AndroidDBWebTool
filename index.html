@@ -147,14 +147,14 @@
 
         .sel_button {
             width: 2em;
-            background: #F1F1F1;
+            background: #CECECE;
         }
 
         .marginTop10 {
             margin-top: 10px;
         }
 
-        td{
+        td {
             padding-right: 3em;
         }
 
@@ -167,15 +167,16 @@
 
     <core-header-panel drawer mode="scroll" id="sidebar">
         <div layout="" vertical="" style="padding: 10px">
-            <paper-button style="background-color: #8BC34A;color: white;margin-bottom: 10px" icon="download" role="button">
+            <paper-button style="background-color: #8BC34A;color: white;margin-bottom: 10px" icon="download"
+                          role="button">
                 <core-icon src="images/Ic_android_48px.png" style="margin-right: 10px;"></core-icon>
                 <label style="color: white">Download APK</label>
             </paper-button>
 
             <h3 id="projectionCollapseLabel" onclick="document.getElementById('proj-collapse').toggle();"
-                style="color:#699BCC;cursor: pointer;">PROJECTIONS&#x20;&#9660;</h3>
+                style="color:#699BCC;cursor: pointer;">* PROJECTIONS&#x20;&#9660;</h3>
             <core-collapse id="proj-collapse" targetLabelElement="projectionCollapseLabel"
-                           targetLabelString="PROJECTIONS" opened="false">
+                           targetLabelString="* PROJECTIONS" opened="false">
                 <x-trigger>
                     <label id="no_projection_label">No projection found</label>
 
@@ -185,15 +186,17 @@
             </core-collapse>
 
             <h3 id="selectionCollapseLabel" onclick="document.getElementById('sel-collapse').toggle();"
-                style="color:#699BCC;cursor: pointer;">SELECTIONS&#x20;&#9660;</h3>
+                style="color:#699BCC;cursor: pointer;">* SELECTIONS&#x20;&#9660;</h3>
             <core-collapse id="sel-collapse" targetLabelElement="selectionCollapseLabel"
-                           targetLabelString="SELECTIONS  " opened="false">
+                           targetLabelString="* SELECTIONS  " opened="false">
                 <x-trigger>
                     <div layout="" vertical="" id="sidebar-selections" style="margin-bottom: 10px;margin-right: 10px">
                         <div layout="" vertical="" style="margin-bottom: 10px">
 
-                            <paper-dropdown-menu id="selectionDropDownMenu" disabled="true" style="background-color: #f1f1f1;">
-                                <paper-dropdown class="dropdown" style="height: 30%;background: white">
+                            <paper-dropdown-menu id="selectionDropDownMenu" disabled="true"
+                                                 style="background-color: #f1f1f1;">
+                                <paper-dropdown class="dropdown"
+                                                style="height: 30%;background: white;width: 230px;border-left: solid 1px;border-color: #CECECE;">
                                     <core-menu id="selection_menu" selected="0" style="background: white">
                                         <paper-item id="selection/-1">No column found</paper-item>
                                     </core-menu>
@@ -201,7 +204,8 @@
                             </paper-dropdown-menu>
 
                             <paper-dropdown-menu id="operatorDropDownMenu" style="background-color: #f1f1f1;">
-                                <paper-dropdown class="dropdown" style="height: 30%;background: white">
+                                <paper-dropdown class="dropdown"
+                                                style="height: 30%;width: 230px;border-left: solid 1px;border-color: #CECECE;background: white">
                                     <core-menu id="operator_menu" selected="0" style="background: white">
                                         <paper-item id="operator/=">=</paper-item>
                                         <paper-item id="operator/<"><</paper-item>
@@ -222,12 +226,13 @@
                                 </paper-dropdown>
                             </paper-dropdown-menu>
 
-                            <input id="selectionArg-input" placeholder="selectionValue" value="" style="margin-top: 10px"/>
+                            <input id="selectionArg-input" placeholder="selectionValue" value=""
+                                   style="margin-top: 10px"/>
                         </div>
 
                         <div layout="" horizontal="" class="marginTop10">
                             <paper-button class="sel_button">ADD</paper-button>
-                            <paper-button class="sel_button">CLEAR</paper-button>
+                            <paper-button class="sel_button">CLEAR ALL</paper-button>
                         </div>
 
                         <div layout="" horizontal="" id="sel_buttons" class="marginTop10">
@@ -235,28 +240,43 @@
                             <paper-button class="sel_button">)</paper-button>
                         </div>
 
-                        <div layout="" horizontal="" class="marginTop10">
+                        <div layout="" horizontal="" class="marginTop10" style="margin-bottom: 20px">
                             <paper-button class="sel_button">AND</paper-button>
                             <paper-button class="sel_button">OR</paper-button>
                         </div>
                         <label id="selectionLabel" class="marginTop10" style="background: #F1F1F1;padding: 10px">No
-                            selections</label>
+                            selections added</label>
                     </div>
                 </x-trigger>
             </core-collapse>
 
             <h3 id="orderCollapseLabel" onclick="document.getElementById('order-collapse').toggle();"
-                style="color:#699BCC;cursor: pointer;">ORDER BY&#x20;&#9660;</h3>
+                style="color:#699BCC;cursor: pointer;">* ORDER BY&#x20;&#9660;</h3>
             <core-collapse id="order-collapse" targetLabelElement="orderCollapseLabel"
-                           targetLabelString="ORDER BY  " opened="false" style="padding-bottom: 300px">
+                           targetLabelString="* ORDER BY  " opened="false" style="padding-bottom: 300px">
                 <x-trigger>
-                    <paper-dropdown-menu id="orderDropDownMenu" disabled="true" style="background-color: #f1f1f1;">
-                        <paper-dropdown class="dropdown" style="height: 250px">
-                            <core-menu id="order_menu" selected="0">
-                                <paper-item id="order/-1">No column found</paper-item>
-                            </core-menu>
-                        </paper-dropdown>
-                    </paper-dropdown-menu>
+
+                    <div layout="" vertical="">
+                        <paper-dropdown-menu id="orderDropDownMenu" disabled="true" style="background-color: #f1f1f1">
+                            <paper-dropdown class="dropdown"
+                                            style="height: 250px;width: 230px;border-left: solid 1px;border-color: #CECECE;">
+                                <core-menu id="order_menu" selected="0">
+                                    <paper-item id="order/-1">No column found</paper-item>
+                                </core-menu>
+                            </paper-dropdown>
+                        </paper-dropdown-menu>
+
+                        <paper-dropdown-menu id="orderByDropDownMenu" style="background-color: #f1f1f1">
+                            <paper-dropdown class="dropdown"
+                                            style="height: 120px;width: 230px;border-left: solid 1px;border-color: #CECECE;">
+                                <core-menu id="orderby_menu" selected="0">
+                                    <paper-item id="orderby/asc">ASC</paper-item>
+                                    <paper-item id="orderby/desc">DESC</paper-item>
+                                </core-menu>
+                            </paper-dropdown>
+                        </paper-dropdown-menu>
+                    </div>
+
                 </x-trigger>
             </core-collapse>
         </div>
@@ -291,7 +311,7 @@
                                 </core-menu>
                             </paper-dropdown>
                         </paper-dropdown-menu>
-                        <paper-spinner-white id="providerSpinner" ></paper-spinner-white>
+                        <paper-spinner-white id="providerSpinner"></paper-spinner-white>
                     </td>
 
                     <td align="center" horizontal="">
@@ -345,7 +365,8 @@
     </core-header-panel>
 </core-drawer-panel>
 <core-drag-drop></core-drag-drop>
-<core-tooltip large="" position="top" label="Drag to move from here" style="position: absolute;top:70%;left:10rem" flex="">
+<core-tooltip large="" position="top" label="Drag to move from here" style="position: absolute;top:70%;left:10rem"
+              flex="">
     <div id="floatingBtn" raggable="false" style="position: absolute;top:90%;left:90%" draggable="true">
         <paper-button id="queryBtn" icon="cloud-download" class="paper-button-circle"
                       style="background-color:#448AFF;width: 25px;height: 74px;child-align: middle;"

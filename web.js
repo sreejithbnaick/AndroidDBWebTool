@@ -13,6 +13,8 @@ var selection = [];
 var ID_proj_checkbox = "proj_checkbox";
 
 var checkBoxIdGenerator = 0;
+var selection;
+var selectionValue;
 
 function onBodyLoad(){
     var sel = document.getElementById("mainHeader");
