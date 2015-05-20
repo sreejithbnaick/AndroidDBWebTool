@@ -83,11 +83,13 @@ function getTables() {
 
 function getDBColumns() {
     var providerIndex = document.getElementById("provider_menu").selectedItem.id.split("/")[1];
-    if (providerIndex < 0)
+    if (providerIndex < 0) {
         return;
+    }
     var table = document.getElementById("table_menu").selectedItem.id.split("/")[1];
-    if (table == -1)
+    if (table == -1) {
         return;
+    }
 
     var url = "http://" + $("#ip").val() + ":" + $("#port").val() + "/" + providerIndex + "/" + table + "/projections";
     console.log(url);
@@ -111,11 +113,15 @@ function getDBColumns() {
 
 function loadDB() {
     var providerIndex = document.getElementById("provider_menu").selectedItem.id.split("/")[1];
-    if (providerIndex < 0)
+    if (providerIndex < 0) {
+        alert("Select PROVIDER");
         return;
+    }
     var table = document.getElementById("table_menu").selectedItem.id.split("/")[1];
-    if (table == -1)
+    if (table == -1) {
+        alert("Select TABLE");
         return;
+    }
     var queryString = "select";
     var projections = getSelectedProjections();
     var orderby = getSelectedOrderColumn();
