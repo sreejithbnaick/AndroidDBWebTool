@@ -17,8 +17,6 @@ var checkBoxIdGenerator = 0;
 function copyToClipboard(text) {
     window.prompt("Copy to clipboard: Ctrl+C, Enter", text);
 }
-var grid;
-var columns = [];
 
 var options = {
     enableCellNavigation: true,
@@ -27,6 +25,7 @@ var options = {
 };
 
 window.addEventListener('polymer-ready', function (e) {
+    var columns = [];
     var data = [];
     grid = new Slick.Grid("#myGrid", data, columns, options);
     grid.onDblClick.subscribe(function (e, args) {
@@ -40,9 +39,13 @@ function onBodyLoad() {
     sel.style.width = window.innerWidth + (document.body.scrollWidth - window.innerWidth) + "px";
     if (window.innerWidth < 1600) {
         sel.style.height = "105px";
+        var height = window.innerHeight - 60 -105;
+        document.getElementById("myGrid").style.height = height+"px";
         document.getElementById("topTable").style.top = "1em";
     } else {
         sel.style.height = "64px";
+        var height = window.innerHeight - 60 -64;
+        document.getElementById("myGrid").style.height = height+"px";
         document.getElementById("topTable").style.top = "0px";
     }
 }
