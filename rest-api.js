@@ -25,6 +25,7 @@ function getProviders() {
         });
         document.getElementById("providerSpinner").active = false;
         document.getElementById("providerDropDownMenu").disabled = true;
+        alert("Error: Check your IP Address");
     });
 }
 
@@ -76,6 +77,7 @@ function getTables() {
         });
         document.getElementById("tableSpinner").active = false;
         document.getElementById("tableDropDownMenu").disabled = true;
+        alert("Error: Check your IP Address");
     });
 }
 
@@ -103,6 +105,7 @@ function getDBColumns() {
         $.getScript('web.js', function () {
             setProjections(null);
         });
+        alert("Error: Check your IP Address");
     });
 }
 
