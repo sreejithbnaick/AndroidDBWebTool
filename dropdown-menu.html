@@ -1,0 +1,46 @@
+<link href="bower_components/polymer/polymer.html" rel="import">
+<link rel="import"
+      href="bower_components/paper-dropdown/paper-dropdown.html">
+<link rel="import"
+      href="bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import"
+      href="bower_components/core-menu/core-menu.html">
+<link rel="import"
+      href="bower_components/paper-item/paper-item.html">
+
+<polymer-element name="dropdown-menu" constructor="" attributes="dataModel label">
+    <template>
+        <paper-dropdown-menu id="menu" label="{{label}}" disabled="true">
+            <paper-dropdown class="dropdown">
+                <core-menu class="menu">
+                    <template repeat="{{processlist}}">
+                        <paper-item>{{}}</paper-item>
+                    </template>
+                </core-menu>
+            </paper-dropdown>
+        </paper-dropdown-menu>
+    </template>
+    <script>
+        Polymer({
+            publish: {
+                dataModel: 'temp',
+                label: 'label'
+            },
+            domReady: function () {
+                this.processlist = [];
+            },
+
+            onInvoke: function () {
+                $.getScript('rest-api.js', getApiData(this.dataModel, this));
+            },
+
+            disable: function () {
+                $('#menu')[0].disabled = true;
+            },
+
+            enable: function () {
+                $('#menu')[0].disabled = false;
+            }
+        });
+    </script>
+</polymer-element>

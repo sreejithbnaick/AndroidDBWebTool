@@ -1,24 +1,43 @@
 /**
  * Created by sreejith on 24/4/15.
  */
-var no_provider_option = "No provider found";
-var choose_provider = "Choose provider";
-var no_table_found = "No table found";
-var choose_table = "Choose table";
-var no_result_found = "No result found";
-var no_column_option = "No columns found";
-var choose_column_option = "Choose column";
+var no_provider_option = "NO PROVIDER FOUND";
+var choose_provider = "CHOOSE PROVIDER";
+var no_table_found = "NO TABLE FOUND";
+var choose_table = "CHOOSE TABLE";
+var no_result_found = "NO RESULT FOUND";
+var no_column_option = "NO COLUMNS FOUND";
+var choose_column_option = "CHOOSE COLUMN";
+var no_selections_added = "NO SELECTIONS ADDED";
 
-var selection = [];
 var ID_proj_checkbox = "proj_checkbox";
 
 var checkBoxIdGenerator = 0;
-var selection;
-var selectionValue;
 
-function onBodyLoad(){
+function copyToClipboard(text) {
+    window.prompt("Copy to clipboard: Ctrl+C, Enter", text);
+}
+var grid;
+var columns = [];
+
+var options = {
+    enableCellNavigation: true,
+    enableColumnReorder: false,
+    editable: true
+};
+
+window.addEventListener('polymer-ready', function (e) {
+    var data = [];
+    grid = new Slick.Grid("#myGrid", data, columns, options);
+    grid.onDblClick.subscribe(function (e, args) {
+        console.log(grid.getActiveCellNode().textContent);
+        copyToClipboard(grid.getActiveCellNode().textContent);
+    });
+});
+
+function onBodyLoad() {
     var sel = document.getElementById("mainHeader");
-    sel.style.width = window.innerWidth+(document.body.scrollWidth-window.innerWidth)+"px";
+    sel.style.width = window.innerWidth + (document.body.scrollWidth - window.innerWidth) + "px";
     if (window.innerWidth < 1600) {
         sel.style.height = "105px";
         document.getElementById("topTable").style.top = "1em";
@@ -29,7 +48,7 @@ function onBodyLoad(){
 }
 
 window.addEventListener('polymer-ready', function (e) {
-   validateIP();
+    validateIP();
 });
 
 window.addEventListener('polymer-ready', function (e) {
@@ -37,9 +56,7 @@ window.addEventListener('polymer-ready', function (e) {
     menu.addEventListener('core-select', function (e) {
         if (e.detail.isSelected) {
             $.getScript('rest-api.js', function () {
-                var index = e.detail.item.id.split("/")[1];
-                console.log("Selected Provider Index:" + index);
-                getTables(index);
+                getTables();
             });
         }
     });
@@ -49,6 +66,7 @@ window.addEventListener('polymer-ready', function (e) {
 window.addEventListener('polymer-ready', function (e) {
     var menu = document.querySelector('#tableDropDownMenu');
     menu.addEventListener('core-select', function (e) {
+        setProjections(null);
         if (e.detail.isSelected) {
             $.getScript('rest-api.js', function () {
                 getDBColumns();
@@ -59,7 +77,7 @@ window.addEventListener('polymer-ready', function (e) {
 
 window.addEventListener('resize', function (e) {
     var sel = document.getElementById("mainHeader");
-    sel.style.width = window.innerWidth+(document.body.scrollWidth-window.innerWidth)+"px";
+    sel.style.width = window.innerWidth + (document.body.scrollWidth - window.innerWidth) + "px";
     if (e.target.innerWidth < 1600) {
         sel.style.height = "105px";
         document.getElementById("topTable").style.top = "1em";
@@ -110,6 +128,88 @@ window.addEventListener('polymer-ready', function (e) {
     });
 });
 
+function addBracketOpen() {
+    var sel = document.getElementById("selectionLabel");
+    var string = sel.innerHTML.toString().trim();
+    if (string.contains(no_selections_added)) {
+        string = "(";
+        selection = string;
+    } else {
+        string = string + " (";
+        selection = selection + " (";
+    }
+    sel.innerHTML = string;
+}
+
+function addBracketClose() {
+    var sel = document.getElementById("selectionLabel");
+    var string = sel.innerHTML.toString().trim();
+    if (string.contains(no_selections_added)) {
+        string = ")";
+        selection = string;
+    } else {
+        string = string + " )";
+        selection = selection + " )";
+    }
+    sel.innerHTML = string;
+}
+
+function clearAll() {
+    document.getElementById("selectionLabel").innerHTML = no_selections_added
+    document.getElementById("selectionArg-input").value = '';
+    selection = null;
+    selectionValue = null;
+}
+
+function addAND() {
+    var sel = document.getElementById("selectionLabel");
+    var string = sel.innerHTML.toString().trim();
+    if (string.contains(no_selections_added)) {
+        string = "AND";
+        selection = string;
+    } else {
+        string = string + " AND";
+        selection = selection + " AND";
+    }
+    sel.innerHTML = string;
+}
+function addOR() {
+    var sel = document.getElementById("selectionLabel");
+    var string = sel.innerHTML.toString().trim();
+    if (string.contains(no_selections_added)) {
+        string = "OR";
+        selection = string;
+    } else {
+        string = string + " OR";
+        selection = selection + " OR";
+    }
+    sel.innerHTML = string;
+}
+function addSel() {
+    var sel = document.getElementById("selectionLabel");
+    var string = sel.innerHTML.toString().trim();
+
+    var selMenu = document.getElementById("selection_menu");
+    var opMenu = document.getElementById("operator_menu");
+    var selValue = document.getElementById("selectionArg-input");
+    var id = selMenu.selectedItem.id.split("/")[1];
+    var op = opMenu.selectedItem.id.split("/")[1];
+    var value = selValue.value.trim();
+    if (id != -1 && value != null && value != "") {
+        if (string.contains(no_selections_added)) {
+            string = id + " " + op + " " + value;
+            selection = id + " " + op + " ?";
+            selectionValue = value;
+        } else {
+            string = string + " " + id + " " + op + " " + value;
+            selection = selection + " " + id + " " + op + " ?";
+            selectionValue = selectionValue + "," + value;
+        }
+        sel.innerHTML = string;
+    }
+    selValue.value = "";
+}
+
 //
 function drop(dragInfo) {
     if (canDrag) {
@@ -133,7 +233,7 @@ document.addEventListener('polymer-ready', function () {
 });
 
 function validateIP() {
-    var input = $("#ip").val()+":"+$("#port").val();
+    var input = $("#ip").val() + ":" + $("#port").val();
     var parts = input.split(":");
     var ip = parts[0].split(".");
     var port = parts[1];
@@ -249,6 +349,9 @@ function clearProjections() {
 function setProjections(projections) {
     if (projections == null || projections.length < 0) {
         document.getElementById("no_projection_label").hidden = false;
+        setPolyProjections(null);
+        var sel = document.getElementById("sidebar-projections");
+        sel.innerHTML = "";
         return;
     } else {
         document.getElementById("no_projection_label").hidden = true;
@@ -266,11 +369,21 @@ function setProjections(projections) {
 }
 
 function setDBResult(tableResult) {
-    var columns = tableResult.columns;
-    var data = tableResult.data;
+    var columns = [];
+    var data = [];
+
+    if (tableResult != null) {
+        columns = tableResult.columns;
+        data = tableResult.data;
+    }
+
+    if (columns == null)
+        columns = [];
+    if (data == null)
+        data = [];
+
     console.log("Columns: " + JSON.stringify(columns));
     console.log("Data: " + JSON.stringify(data));
-
     grid.setColumns(columns);
     grid.setData(data);
     grid.invalidate();
@@ -281,7 +394,7 @@ function createPaperItem(name, value) {
     var option = document.createElement('paper-item');
     //option.label = value;
     option.id = value;
-    option.innerHTML = name;
+    option.innerHTML = name.toUpperCase();
     return option;
 }
 
@@ -295,7 +408,7 @@ function createCoreMenu(id) {
 function createPaperCheckbox(type, label, onChange) {
     var option = document.createElement('paper-checkbox');
     option.role = "checkbox";
-    option.label = label;
+    option.label = label.toUpperCase();
     option.id = getNewCheckBoxId(type);
     //option.onChange = onChange;
     return option;
@@ -316,4 +429,16 @@ function createSpanElement(spanText) {
     var span = document.createElement('span');
     span.innerHTML = spanText;
     return span;
+}
+
+function blockUI() {
+    $.getScript('jquery.isloading.min.js', function () {
+        $.isLoading({text: "Please Wait", position:'center'});
+    });
+}
+
+function unBlockUI() {
+    $.getScript('jquery.isloading.min.js', function () {
+        $.isLoading("hide");
+    });
 }

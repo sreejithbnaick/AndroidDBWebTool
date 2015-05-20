@@ -1,6 +1,12 @@
 /**
  * Created by sreejith on 24/4/15.
  */
+
+function getApiData(dataModel, context) {
+    console.log(dataModel);
+    getTable(context);
+}
+
 function getProviders() {
     var url = "http://" + $("#ip").val() + ":" + $("#port").val();
     console.log(url);
@@ -19,6 +25,29 @@ function getProviders() {
         });
         document.getElementById("providerSpinner").active = false;
         document.getElementById("providerDropDownMenu").disabled = true;
+    });
+}
+
+function getTable(context) {
+    var providerIndex = document.getElementById("provider_menu").selectedItem.id.split("/")[1];
+    if (providerIndex < 0) {
+        context.processlist = [];
+        return;
+    }
+
+    var url = "http://" + $("#ip").val() + ":" + $("#port").val() + "/" + providerIndex;
+    console.log(url);
+
+    document.getElementById("tableSpinner").active = true;
+    var xhr = makeCorsRequest(url, function () {
+        console.log("getTables: " + xhr.responseText);
+        document.getElementById("tableSpinner").active = false;
+        context.processlist = JSON.parse(xhr.responseText);
+    }, function () {
+        console.log("getTables: onerror");
+        context.processlist = [];
+        document.getElementById("tableSpinner").active = false;
+        document.getElementById("tableDropDownMenu").disabled = true;
     });
 }
 
@@ -61,13 +90,16 @@ function getDBColumns() {
     var url = "http://" + $("#ip").val() + ":" + $("#port").val() + "/" + providerIndex + "/" + table + "/projections";
     console.log(url);
 
+    document.getElementById("tableSpinner").active = true;
     var xhr = makeCorsRequest(url, function () {
         console.log("getDBColumns: " + xhr.responseText);
+        document.getElementById("tableSpinner").active = false;
         $.getScript('web.js', function () {
             setProjections(JSON.parse(xhr.responseText));
         });
     }, function () {
         console.log("getDBColumns: onerror");
+        document.getElementById("tableSpinner").active = false;
         $.getScript('web.js', function () {
             setProjections(null);
         });
@@ -81,7 +113,7 @@ function loadDB() {
     var table = document.getElementById("table_menu").selectedItem.id.split("/")[1];
     if (table == -1)
         return;
-
+    var queryString = "select";
     var projections = getSelectedProjections();
     var orderby = getSelectedOrderColumn();
 
@@ -89,21 +121,54 @@ function loadDB() {
 
     if (projections != null) {
         url += "&proj=" + projections;
+        queryString = queryString+" "+projections;
+    }else{
+        queryString = queryString+" *";
     }
 
-    if(orderby!=null){
-        url+="&order="+orderby;
+    queryString = queryString+" from "+table;
+
+    console.log(selection);
+    console.log(selectionValue);
+
+    var sel = selection;
+    var selVal = selectionValue;
+
+    if (sel != null && sel.trim() != '') {
+        url += "&sel=" + encodeURI(sel);
+        queryString = queryString +" where "+ document.getElementById("selectionLabel").innerHTML.toString();
     }
+
+    if (selVal != null && selVal.trim() != '') {
+        url += "&selargs=" + selVal;
+    }
+
+    if (orderby != null) {
+        url += "&order=" + orderby;
+        queryString = queryString+" order by "+orderby;
+    }
+    console.log(queryString);
+    document.getElementById("query").innerHTML = queryString.toUpperCase();
 
     console.log(url);
 
+    $.getScript('web.js', function () {
+        blockUI();
+    });
+
     var xhr = makeCorsRequest(url, function () {
         console.log("loadDB: " + xhr.responseText);
+        $.getScript('web.js', function () {
+            unBlockUI();
+        });
         $.getScript('web.js', function () {
             setDBResult(JSON.parse(xhr.responseText));
         });
     }, function () {
         console.log("loadDB: onerror");
+        $.getScript('web.js', function () {
+            unBlockUI();
+        });
         $.getScript('web.js', function () {
             setDBResult(null);
         });
@@ -132,7 +197,7 @@ function getSelectedOrderColumn() {
     if (col == -1 || col == "-1")
         return null;
     else
-        return col+" "+asdes;
+        return col + " " + asdes;
 }
 
 function createCORSRequest(method, url) {
