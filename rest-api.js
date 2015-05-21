@@ -167,6 +167,15 @@ function loadDB() {
 
     var xhr = makeCorsRequest(url, function () {
         console.log("loadDB: " + xhr.responseText);
+        var resp = xhr.responseText;
+        if(resp.contains('502 Internal Server Error')){
+            $.getScript('web.js', function () {
+                unBlockUI();
+            });
+            alert("Error: "+resp.replace('502 Internal Server Error<br/>',''));
+
+            return;
+        }
         $.getScript('web.js', function () {
             unBlockUI();
         });

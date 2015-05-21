@@ -57,6 +57,7 @@ window.addEventListener('polymer-ready', function (e) {
 window.addEventListener('polymer-ready', function (e) {
     var menu = document.querySelector('#providerDropDownMenu');
     menu.addEventListener('core-select', function (e) {
+        clearAll();
         if (e.detail.isSelected) {
             $.getScript('rest-api.js', function () {
                 getTables();
@@ -70,6 +71,7 @@ window.addEventListener('polymer-ready', function (e) {
     var menu = document.querySelector('#tableDropDownMenu');
     menu.addEventListener('core-select', function (e) {
         setProjections(null);
+        clearAll();
         if (e.detail.isSelected) {
             $.getScript('rest-api.js', function () {
                 getDBColumns();
