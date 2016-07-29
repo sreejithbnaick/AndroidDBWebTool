@@ -51,7 +51,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   position: relative;
   box-sizing: border-box;
   height: 100%;
-  border: solid 2px #5a5a5a;
+  border: solid 2px white;
   border-radius: 2px;
   pointer-events: none;
   -webkit-transition: background-color 140ms, border-color 140ms;

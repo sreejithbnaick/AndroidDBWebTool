@@ -1,6 +1,7 @@
 /**
  * Created by sreejith on 24/4/15.
  */
+var invalid_device_id = "invalid device id";
 
 function getApiData(dataModel, context) {
     console.log(dataModel);
@@ -8,11 +9,31 @@ function getApiData(dataModel, context) {
 }
 
 function getProviders() {
-    var url = "http://" + $("#ip").val() + ":" + $("#port").val();
+    var checkbox = $("#phoneMode")[0];
+    var ipMode = checkbox.checked;
+    if (ipMode)
+        var url = "http://" + $("#ip").val() + ":" + $("#port").val();
+    else {
+        var deviceID = document.getElementById("device_menu").selectedItem.id.split("/")[1];
+        if (deviceID == "-1") {
+            setPolyProviders(null);
+            return;
+        }
+        var url = "http://adb.dexetra.com:8081/" + deviceID;
+    }
+
     console.log(url);
     document.getElementById("providerSpinner").active = true;
     var xhr = makeCorsRequest(url, function () {
         console.log("getProviders: " + xhr.responseText);
+        if (xhr.responseText.toLowerCase().contains(invalid_device_id)) {
+            $.getScript('web.js', function () {
+                setPolyDevices(null);
+            });
+            getConnectedDevices();
+            alert("Device is not connected to server.");
+            return;
+        }
         $.getScript('web.js', function () {
             setPolyProviders(JSON.parse(xhr.responseText));
         });
@@ -36,13 +57,35 @@ function getTable(context) {
         return;
     }
 
-    var url = "http://" + $("#ip").val() + ":" + $("#port").val() + "/" + providerIndex;
+    var checkbox = $("#phoneMode")[0];
+    var ipMode = checkbox.checked;
+    if (ipMode)
+        var url = "http://" + $("#ip").val() + ":" + $("#port").val() + "/" + providerIndex;
+    else {
+        var deviceID = document.getElementById("device_menu").selectedItem.id.split("/")[1];
+        if (deviceID == "-1") {
+            return;
+        }
+        var url = "http://adb.dexetra.com:8081/" + deviceID + "/" + providerIndex;
+    }
+
     console.log(url);
 
     document.getElementById("tableSpinner").active = true;
     var xhr = makeCorsRequest(url, function () {
         console.log("getTables: " + xhr.responseText);
         document.getElementById("tableSpinner").active = false;
+
+        if (xhr.responseText.toLowerCase().contains(invalid_device_id)) {
+            $.getScript('web.js', function () {
+                setPolyDevices(null);
+            });
+            getConnectedDevices();
+            context.processlist = [];
+            alert("Device is not connected to server.");
+            return;
+        }
+
         context.processlist = JSON.parse(xhr.responseText);
     }, function () {
         console.log("getTables: onerror");
@@ -60,13 +103,34 @@ function getTables() {
         return;
     }
 
-    var url = "http://" + $("#ip").val() + ":" + $("#port").val() + "/" + providerIndex;
+    var checkbox = $("#phoneMode")[0];
+    var ipMode = checkbox.checked;
+    if (ipMode)
+        var url = "http://" + $("#ip").val() + ":" + $("#port").val() + "/" + providerIndex;
+    else {
+        var deviceID = document.getElementById("device_menu").selectedItem.id.split("/")[1];
+        if (deviceID == "-1") {
+            return;
+        }
+        var url = "http://adb.dexetra.com:8081/" + deviceID + "/" + providerIndex;
+    }
+
     console.log(url);
 
     document.getElementById("tableSpinner").active = true;
     var xhr = makeCorsRequest(url, function () {
         console.log("getTables: " + xhr.responseText);
         document.getElementById("tableSpinner").active = false;
+
+        if (xhr.responseText.toLowerCase().contains(invalid_device_id)) {
+            $.getScript('web.js', function () {
+                setPolyDevices(null);
+            });
+            getConnectedDevices();
+            alert("Device is not connected to server.");
+            return;
+        }
+
         $.getScript('web.js', function () {
             setPolyTables(JSON.parse(xhr.responseText));
         });
@@ -91,13 +155,33 @@ function getDBColumns() {
         return;
     }
 
-    var url = "http://" + $("#ip").val() + ":" + $("#port").val() + "/" + providerIndex + "/" + table + "/projections";
+    var checkbox = $("#phoneMode")[0];
+    var ipMode = checkbox.checked;
+    if (ipMode)
+        var url = "http://" + $("#ip").val() + ":" + $("#port").val() + "/" + providerIndex + "/" + table + "/projections";
+    else {
+        var deviceID = document.getElementById("device_menu").selectedItem.id.split("/")[1];
+        if (deviceID == "-1") {
+            return;
+        }
+        var url = "http://adb.dexetra.com:8081/" + deviceID + "/" + providerIndex + "/" + table + "/projections";
+    }
+
     console.log(url);
 
     document.getElementById("tableSpinner").active = true;
     var xhr = makeCorsRequest(url, function () {
         console.log("getDBColumns: " + xhr.responseText);
         document.getElementById("tableSpinner").active = false;
+        if (xhr.responseText.toLowerCase().contains(invalid_device_id)) {
+            $.getScript('web.js', function () {
+                setPolyDevices(null);
+            });
+            getConnectedDevices();
+            alert("Device is not connected to server.");
+            return;
+        }
+
         $.getScript('web.js', function () {
             setProjections(JSON.parse(xhr.responseText));
         });
@@ -126,16 +210,26 @@ function loadDB() {
     var projections = getSelectedProjections();
     var orderby = getSelectedOrderColumn();
 
-    var url = "http://" + $("#ip").val() + ":" + $("#port").val() + "/" + providerIndex + "/" + table + "?type=json";
+    var checkbox = $("#phoneMode")[0];
+    var ipMode = checkbox.checked;
+    if (ipMode)
+        var url = "http://" + $("#ip").val() + ":" + $("#port").val() + "/" + providerIndex + "/" + table + "?type=json";
+    else {
+        var deviceID = document.getElementById("device_menu").selectedItem.id.split("/")[1];
+        if (deviceID == "-1") {
+            return;
+        }
+        var url = "http://adb.dexetra.com:8081/" + deviceID + "/" + providerIndex + "/" + table + "?type=json";
+    }
 
     if (projections != null) {
         url += "&proj=" + projections;
-        queryString = queryString+" "+projections;
-    }else{
-        queryString = queryString+" *";
+        queryString = queryString + " " + projections;
+    } else {
+        queryString = queryString + " *";
     }
 
-    queryString = queryString+" from "+table;
+    queryString = queryString + " from " + table;
 
     console.log(selection);
     console.log(selectionValue);
@@ -145,7 +239,7 @@ function loadDB() {
 
     if (sel != null && sel.trim() != '') {
         url += "&sel=" + encodeURI(sel);
-        queryString = queryString +" where "+ document.getElementById("selectionLabel").innerHTML.toString();
+        queryString = queryString + " where " + document.getElementById("selectionLabel").innerHTML.toString();
     }
 
     if (selVal != null && selVal.trim() != '') {
@@ -154,7 +248,7 @@ function loadDB() {
 
     if (orderby != null) {
         url += "&order=" + orderby;
-        queryString = queryString+" order by "+orderby;
+        queryString = queryString + " order by " + orderby;
     }
     console.log(queryString);
     document.getElementById("query").innerHTML = queryString.toUpperCase();
@@ -168,11 +262,22 @@ function loadDB() {
     var xhr = makeCorsRequest(url, function () {
         console.log("loadDB: " + xhr.responseText);
         var resp = xhr.responseText;
-        if(resp.contains('502 Internal Server Error')){
+
+        if (resp.toLowerCase().contains(invalid_device_id)) {
+            $.getScript('web.js', function () {
+                unBlockUI();
+                setPolyDevices(null);
+            });
+            getConnectedDevices();
+            alert("Device is not connected to server.");
+            return;
+        }
+
+        if (resp.contains('502 Internal Server Error')) {
             $.getScript('web.js', function () {
                 unBlockUI();
             });
-            alert("Error: "+resp.replace('502 Internal Server Error<br/>',''));
+            alert("Error: " + resp.replace('502 Internal Server Error<br/>', ''));
 
             return;
         }
@@ -190,6 +295,24 @@ function loadDB() {
         $.getScript('web.js', function () {
             setDBResult(null);
         });
+    });
+}
+
+function getConnectedDevices() {
+    var url = "http://adb.dexetra.com:8081/";
+    document.getElementById("deviceSpinner").active = true;
+    var xhr = makeCorsRequest(url, function () {
+        //console.log("getConnectedDevices: " + xhr.responseText);
+        $.getScript('web.js', function () {
+            setPolyDevices(JSON.parse(xhr.responseText));
+        });
+        document.getElementById("deviceSpinner").active = false;
+    }, function () {
+        console.log("getConnectedDevices: onerror");
+        $.getScript('web.js', function () {
+            setPolyDevices(null);
+        });
+        document.getElementById("deviceSpinner").active = false;
     });
 }
 

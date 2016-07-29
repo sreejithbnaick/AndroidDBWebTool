@@ -9,6 +9,8 @@ var no_result_found = "NO RESULT FOUND";
 var no_column_option = "NO COLUMNS FOUND";
 var choose_column_option = "CHOOSE COLUMN";
 var no_selections_added = "NO SELECTIONS ADDED";
+var choose_device = "CHOOSE DEVICE";
+var no_devices_found = "NO DEVICES FOUND";
 
 var ID_proj_checkbox = "proj_checkbox";
 
@@ -25,6 +27,18 @@ var options = {
 };
 
 window.addEventListener('polymer-ready', function (e) {
+    //setup main header
+    var sel = document.getElementById("mainHeader");
+    sel.style.width = window.innerWidth + (document.body.scrollWidth - window.innerWidth) + "px";
+    if (e.target.innerWidth < 1600) {
+        sel.style.height = "105px";
+        document.getElementById("topTable").style.top = "1em";
+    } else {
+        sel.style.height = "64px";
+        document.getElementById("topTable").style.top = "0px";
+    }
+
+    //grid double click listener
     var columns = [];
     var data = [];
     grid = new Slick.Grid("#myGrid", data, columns, options);
@@ -32,29 +46,11 @@ window.addEventListener('polymer-ready', function (e) {
         console.log(grid.getActiveCellNode().textContent);
         copyToClipboard(grid.getActiveCellNode().textContent);
     });
-});
 
-function onBodyLoad() {
-    var sel = document.getElementById("mainHeader");
-    sel.style.width = window.innerWidth + (document.body.scrollWidth - window.innerWidth) + "px";
-    if (window.innerWidth < 1600) {
-        sel.style.height = "105px";
-        var height = window.innerHeight - 60 -105;
-        document.getElementById("myGrid").style.height = height+"px";
-        document.getElementById("topTable").style.top = "1em";
-    } else {
-        sel.style.height = "64px";
-        var height = window.innerHeight - 60 -64;
-        document.getElementById("myGrid").style.height = height+"px";
-        document.getElementById("topTable").style.top = "0px";
-    }
-}
-
-window.addEventListener('polymer-ready', function (e) {
+    //validate ip
     validateIP();
-});
 
-window.addEventListener('polymer-ready', function (e) {
+    //provider dropdown menu
     var menu = document.querySelector('#providerDropDownMenu');
     menu.addEventListener('core-select', function (e) {
         clearAll();
@@ -64,10 +60,8 @@ window.addEventListener('polymer-ready', function (e) {
             });
         }
     });
-});
 
-
-window.addEventListener('polymer-ready', function (e) {
+    //table dropdown menu
     var menu = document.querySelector('#tableDropDownMenu');
     menu.addEventListener('core-select', function (e) {
         setProjections(null);
@@ -78,20 +72,34 @@ window.addEventListener('polymer-ready', function (e) {
             });
         }
     });
+
+    //table dropdown menu
+    var menu = document.querySelector('#deviceDropDownMenu');
+    menu.addEventListener('core-select', function (e) {
+        if (e.detail.isSelected) {
+            $.getScript('rest-api.js', function () {
+                getProviders();
+            });
+        }
+    });
+
 });
 
-window.addEventListener('resize', function (e) {
+function onBodyLoad() {
     var sel = document.getElementById("mainHeader");
     sel.style.width = window.innerWidth + (document.body.scrollWidth - window.innerWidth) + "px";
-    if (e.target.innerWidth < 1600) {
+    if (window.innerWidth < 1600) {
         sel.style.height = "105px";
+        var height = window.innerHeight - 60 - 105;
+        document.getElementById("myGrid").style.height = height + "px";
         document.getElementById("topTable").style.top = "1em";
     } else {
         sel.style.height = "64px";
+        var height = window.innerHeight - 60 - 64;
+        document.getElementById("myGrid").style.height = height + "px";
         document.getElementById("topTable").style.top = "0px";
     }
-});
-
+}
 var canDrag = false;
 window.addEventListener('polymer-ready', function (e) {
     addEventListener('drag-start', function (e) {
@@ -132,6 +140,28 @@ window.addEventListener('polymer-ready', function (e) {
         dragInfo.drop = drop;
     });
 });
+
+function phoneModeChanged() {
+    var checkbox = $("#phoneMode")[0];
+    var ipTD = $("#td_ip")[0];
+    var devTD = $("#td_device")[0];
+
+    if (checkbox.checked) {
+        ipTD.hidden = false;
+        devTD.hidden = true;
+    } else {
+        ipTD.hidden = true;
+        devTD.hidden = false;
+        checkDevices();
+    }
+}
+
+function checkDevices() {
+    console.log("check for Devices");
+    $.getScript('rest-api.js', function () {
+        getConnectedDevices();
+    });
+}
 
 function addBracketOpen() {
     var sel = document.getElementById("selectionLabel");
@@ -269,11 +299,13 @@ function setPolyProviders(providerArray) {
     sel = createCoreMenu("provider_menu");
     par.appendChild(sel);
 
-    if (providerArray == null) {
+    if (providerArray == null || providerArray.length<1) {
         console.log("No provider found");
         clearProjections();
         sel.appendChild(createPaperItem(no_provider_option, "provider/" + -1));
+        document.getElementById("providerDropDownMenu").disabled = true;
     } else {
+        document.getElementById("providerDropDownMenu").disabled = false;
         sel.appendChild(createPaperItem(choose_provider, "provider/" + -1));
 
         var x = 0;
@@ -317,6 +349,34 @@ function setPolyProjections(projectionArray) {
         for (; x < projectionArray.length; x++) {
             sel.appendChild(createPaperItem(projectionArray[x], "selection/" + projectionArray[x]));
             order.appendChild(createPaperItem(projectionArray[x], "order/" + projectionArray[x]));
+        }
+    }
+}
+
+function setPolyDevices(devicesArray) {
+    var sel = document.getElementById("device_menu");
+    var par = sel.parentNode;
+
+    par.removeChild(sel);
+
+    sel = createCoreMenu("device_menu");
+    par.appendChild(sel);
+
+    if (devicesArray == null || devicesArray.length == 0) {
+        //console.log("No devices found");
+        clearProjections();
+        sel.appendChild(createPaperItem(no_devices_found, "device/" + -1));
+        document.getElementById("deviceDropDownMenu").disabled = true;
+    } else {
+        document.getElementById("deviceDropDownMenu").disabled = false;
+        sel.appendChild(createPaperItem(choose_device, "device/" + -1));
+
+        var x = 0;
+        for (; x < devicesArray.length; x++) {
+            var device = devicesArray[x].split(";");
+            var id = device[0];
+            var device = decodeURI(device[1]).replace("+", " ").replace("/", " ");
+            sel.appendChild(createPaperItem(device, "device/" + id));
         }
     }
 }
@@ -438,7 +498,7 @@ function createSpanElement(spanText) {
 
 function blockUI() {
     $.getScript('jquery.isloading.min.js', function () {
-        $.isLoading({text: "Please Wait", position:'center'});
+        $.isLoading({text: "Please Wait", position: 'center'});
     });
 }
 

@@ -3,8 +3,8 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <title>AndroidDBTool</title>
-    <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" />
+    <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32"/>
+    <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16"/>
     <link rel="stylesheet" href="slick.grid.css" type="text/css"/>
     <link rel="stylesheet" href="jquery-ui-1.8.16.custom.css" type="text/css"/>
     <link rel="stylesheet" href="examples.css" type="text/css"/>
@@ -176,16 +176,18 @@
 
     <core-header-panel drawer mode="scroll" id="sidebar">
         <div layout="" vertical="" style="padding: 10px;padding-right: 20px">
-            <paper-button style="background-color: #8BC34A;color: white;margin-bottom: 10px" icon="download" onclick="window.open('http://adb.dexetra.com:8080/androidDbTool.apk');"
+            <paper-button style="background-color: #8BC34A;color: white;margin-bottom: 10px" icon="download"
+                          onclick="window.open('http://adb.dexetra.com:8080/androidDbTool.apk');"
                           role="button">
                 <core-icon src="images/Ic_android_48px.png" style="margin-right: 10px;"></core-icon>
                 <label style="color: white">Download APK</label>
             </paper-button>
 
-            <paper-button style="background-color: #8BC34A;color: white;margin-bottom: 10px" icon="download" onclick="window.open('http://adb.dexetra.com:8080/ADBTool.xpi');"
+            <paper-button style="background-color: #8BC34A;color: white;margin-bottom: 10px" icon="download"
+                          onclick="window.open('http://adb.dexetra.com:8080/ADBTool.xpi');"
                           role="button">
-                <core-icon src="favicon-32x32.png" style="margin-right: 10px;"></core-icon>
-                <label style="color: white">Download FireFox Addon</label>
+                <core-icon src="icon-32.png" style="margin-right: 10px;"></core-icon>
+                <label style="color: white">Get FireFox Addon</label>
             </paper-button>
 
             <h3 id="projectionCollapseLabel" onclick="document.getElementById('proj-collapse').toggle();"
@@ -304,7 +306,26 @@
                     id="navicon" icon="menu"></paper-icon-button>
             <table id="topTable" style="border: 0px;position: relative;top: 1em" flex="">
                 <tr align="center">
-                    <td horizontal="">
+                    <td horizontal="" style="padding-top: 0.5em">
+                        <paper-checkbox id="phoneMode" label="IP MODE"
+                                        onchange="phoneModeChanged()" checked="true"></paper-checkbox>
+                    </td>
+                    <td id="td_device" horizontal="" hidden="true">
+                        <label>DEVICES:</label>
+                        <paper-dropdown-menu id="deviceDropDownMenu" disabled="true">
+                            <paper-dropdown class="dropdown">
+                                <core-menu id="device_menu" selected="0">
+                                    <paper-item id="device/-1">NO DEVICES FOUND</paper-item>
+                                </core-menu>
+                            </paper-dropdown>
+                        </paper-dropdown-menu>
+                        <paper-spinner-white id="deviceSpinner"></paper-spinner-white>
+                        <paper-icon-button class="paper-button-circle" icon="refresh"
+                                           onclick="getConnectedDevices()">LOAD PROVIDERS
+                        </paper-icon-button>
+                    </td>
+
+                    <td id="td_ip" horizontal="">
                         <label>IP:</label>
                         <input id="ip" placeholder="ip-address" oninput="validateIP();" value=""
                                style="width: 8em"/>
